@@ -6,29 +6,34 @@
 #    By: dboudy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/11/24 10:53:12 by dboudy            #+#    #+#              #
-#    Updated: 2016/01/19 16:02:37 by dboudy           ###   ########.fr        #
+#    Updated: 2016/01/19 17:03:02 by dboudy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = FdF
 GCC = gcc
-CFLAGS = -lmlx -framework OpenGL -framework AppKit
+PATH_SRC = ./
+PATH_OBJ = ./obj/
+PATH_INC = ./libft/includes/
+CFLAGS = -Wall -Werror -Wextra
+FLAGS2 = -lmlx -framework OpenGL -framework AppKit
 HEADERS = includes/
-SRCS = fdf.c draw_form.c \
+SRC = fdf.c draw_shape.c\
+
+OBJ = $(patsubst %.c,%.o,$(addprefix $(PATH_SRC), $(SRC)))
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	 $(GCC) $(CFLAGS) $(SRCS) -I $(HEADERS) -o $(NAME)
+	$(GCC) $(CFLAGS) -I $(HEADERS) -c $(SRC)
+	$(GCC) -o $(NAME) $(OBJ) -lm -L libft/ -lft $(FLAGS2)
 
-.PHONY: clean fclean re mrproper
+.PHONY: clean fclean re
 
 clean:
-	rm -rf $(OBJS)
+	rm -rf $(OBJ)
 
 fclean: clean
-	rm -rf $(NAME) 
-
-mrproper: all clean
+	rm -rf $(NAME)
 
 re: fclean all

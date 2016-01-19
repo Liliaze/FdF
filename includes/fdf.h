@@ -6,7 +6,7 @@
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/18 15:27:18 by dboudy            #+#    #+#             */
-/*   Updated: 2016/01/18 18:09:10 by dboudy           ###   ########.fr       */
+/*   Updated: 2016/01/19 18:05:06 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,10 @@
 # define YELLOW	0x00FFFF00
 # define CYAN	0x0033FFFF
 # define PINK	0x00FF7F7F
+# define PURPLE 0x00FF00FF
 # define BROWN	0x00663300
 
-typedef struct	s_form
+typedef struct	s_shape
 {
 	int			x;
 	int			y;
@@ -37,7 +38,7 @@ typedef struct	s_form
 	int			w;
 	int			t;
 	int			color;
-}				t_form;
+}				t_shape;
 
 typedef struct	s_window
 {
@@ -47,8 +48,8 @@ typedef struct	s_window
 	int			w;
 }				t_win;
 
-int		draw_carre(t_win *win, t_form *form);
-int		draw_arc_en_ciel(t_win *win, int x, int y);
+int		draw_carre(t_win *win, t_shape *sh);
+int		draw_arc(t_win *win, t_shape *sh);
 int		event(int keycode, void *param);
 
 #endif
