@@ -6,7 +6,7 @@
 #    By: dboudy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/11/24 10:53:12 by dboudy            #+#    #+#              #
-#    Updated: 2016/01/19 17:03:02 by dboudy           ###   ########.fr        #
+#    Updated: 2016/01/20 14:54:34 by dboudy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ PATH_INC = ./libft/includes/
 CFLAGS = -Wall -Werror -Wextra
 FLAGS2 = -lmlx -framework OpenGL -framework AppKit
 HEADERS = includes/
-SRC = fdf.c draw_shape.c\
+SRC = fdf.c draw_shape.c key_hook.c\
 
 OBJ = $(patsubst %.c,%.o,$(addprefix $(PATH_SRC), $(SRC)))
 
