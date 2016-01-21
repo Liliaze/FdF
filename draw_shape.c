@@ -6,14 +6,16 @@
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/18 16:27:10 by dboudy            #+#    #+#             */
-/*   Updated: 2016/01/20 17:17:44 by dboudy           ###   ########.fr       */
+/*   Updated: 2016/01/21 14:07:21 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/fdf.h"
+#include "fdf.h"
 
-void	init_shape(t_win *win, t_shape *shape)
+void	init_shape(t_win *win, t_shape *shape, t_map *map)
 {
+	map->mlx = win->mlx;
+	map->win = win->win;
 	shape->mlx = win->mlx;
 	shape->win = win->win;
 	shape->h = 150;
@@ -22,6 +24,38 @@ void	init_shape(t_win *win, t_shape *shape)
 	shape->y = (win->h - shape->h) / 2;
 	shape->t = 5;
 	shape->color = PINK;
+}
+
+int	draw_segment(t_map *map)
+{
+	float	dx;
+	float	dy;
+	float	coef;
+	int		i;
+
+	dx = map->bx - map->ax;
+	dy = map->by - map->ay;
+	coef = dy / dx;
+	i = -1;
+	if (dx == 0)
+	{
+		while (++i <= dy)
+			mlx_pixel_put(map->mlx, map->win, map->ax, map->by - i , GREEN);
+		i = 1;
+		while (--i >= dy)
+			mlx_pixel_put(map->mlx, map->win, map->ax, map->by - i , BLUE);
+	}
+	else
+	{
+		while (++i <= dx)
+			mlx_pixel_put(map->mlx, map->win, round(map->ax + i),
+					round(coef * i + map->ay) , PINK);
+		i = 1;
+		while (i-- > dx)
+			mlx_pixel_put(map->mlx, map->win, round(map->ax + i),
+					round(coef * i + map->ay) , YELLOW);
+	}
+	return (1);
 }
 
 int		draw_welcome(t_shape *shape)
