@@ -5,25 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/18 15:27:18 by dboudy            #+#    #+#             */
-/*   Updated: 2016/01/21 16:07:11 by dboudy           ###   ########.fr       */
+/*   Created: 2016/02/01 11:52:57 by dboudy            #+#    #+#             */
+/*   Updated: 2016/02/03 16:29:00 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
-
-# include <mlx.h>
-# include <math.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <stdio.h> // ATTENTION AVANT RENDUE !!
-# include "libft.h"
-
-# define BUFF_SIZE 25
 
 # define BLACK	0x00000000
 # define BROWN	0x00663300
@@ -39,49 +27,68 @@
 # define SALMON	0x00FF7F7F
 # define PURPLE 0x00882289
 
-typedef struct	s_shape
+# define Q		12
+# define ECHAP	53
+# define ENTER	36
+# define DEL	51
+# define UP		126
+# define DOWN	125
+# define LEFT	123
+# define RIGHT	124
+# define W		13
+# define A		0
+# define S		1
+# define D		2
+# define LESS	78
+# define MORE	69
+# define SPACE	49
+
+# include <mlx.h>
+# include <math.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/uio.h>
+# include <stdio.h> // ATTENTION AVANT RENDUE !!
+# include "../libft/includes/libft.h"
+
+typedef struct		s_win
 {
-	void		*mlx;
-	void		*win;
-	int			x;
-	int			y;
-	int			h;
-	int			w;
-	int			t;
-	int			color;
-}				t_shape;
+	void			*mlx;
+	void			*win;
+	void			*image;
+	int				width;
+	int				height;
+}					t_win;
 
-typedef struct	s_map
+typedef struct		s_point
 {
-	char		**map;
-	void		*mlx;
-	void		*win;
-	int			l;
-	int			c;
-	int			ax;
-	int			ay;
-	int			az;
-	int			bx;
-	int			by;
-	int			bz;
-}				t_map;
+	int				x1;
+	int				y1;
+	int				z1;
+	int				x2;
+	int				y2;
+	int				z2;
+}					t_point;
 
-typedef struct	s_window
-{	
-	void		*mlx;
-	void		*win;
-	int			h;
-	int			w;
-}				t_win;
+typedef struct		s_map
+{
+	char			***map;
+	char			*name;
+	int				size;
+}					t_map;
 
-void	init_shape(t_win *win, t_shape *shape, t_map *map);
-int		get_next_line(int const fd, char **line);
-int		close_win(int keycode, t_shape *shape);
-int		draw_segment(t_map *map);
-int		draw_welcome(t_shape *sh);
-int		draw_del(t_shape *sh);
-int		draw_carre(t_shape *sh);
-int		draw_arc(t_shape *sh);
-int		event(int keycode, void *param);
+typedef struct		s_all
+{
+	t_point			*apoint;
+	t_map			*amap;
+	t_win			*awin;
+}					t_all;
+
+int		key_press(int key, t_all *all);
+int		bres(t_all *all);
+int		open_map(t_all * all);
+void	display_error(char *text);
 
 #endif

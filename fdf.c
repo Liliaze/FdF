@@ -5,120 +5,63 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/18 17:42:20 by dboudy            #+#    #+#             */
-/*   Updated: 2016/01/21 16:44:04 by dboudy           ###   ########.fr       */
+/*   Created: 2016/02/01 11:51:02 by dboudy            #+#    #+#             */
+/*   Updated: 2016/02/03 13:54:39 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-/*
-int	getnbr(char *str, int *point)
+
+static	void	init_size_win(t_all	*all)
 {
-	int len;
-
-	len = 0;
-	while (str != ' ')
-	{
-		len++;
-	}
-	point = atoii
-
-	return (len);
-}
-*/
-int	draw_map(t_map *map)
-{
-	int	i;
-	int	line;
-	int	ecart;
-	int	ecartl;
-
-	line = 0;
-	ecartl = 10;
-	while (map->map[line] < map->map[map->l])
-	{
-		i = 0;
-		ecart = 10;
-		while (map->map[line][i])
-		{
-			mlx_pixel_put(map->mlx, map->win, i + ecart, line + ecartl, BLUE);
-			printf("i + ecart = %d, line + ecartl = %d\n", i + ecart, line + ecartl);
-			i++;
-			ecart = 10 * i;
-		}
-		line++;
-		ecartl = 10 * line;
-	}
-	return (1);
+	all->awin->width = 640;
+	all->awin->height = 480;
 }
 
-int	read_map(t_map *map, char *av)
+void	init_struct(t_all *all)
 {
-	int		fd;
-	int		ret;
-	int		i;
-
-	ret = 1;
-	fd = open(av, O_RDONLY);
-	printf("\n\n======= MAP ======\nfd = %d\n", fd);
-	map->map = (char **)malloc(sizeof(char*) * (map->l + 1));
-	printf("map->l = %d", map->l);
-	i = 0;
-	while (i < map->l)
-	{
-		ret = get_next_line(fd, &(map->map[i]));
-		printf("i = %d, ret = %d et map[i] = %s\n", i, ret, map->map[i]);
-		i++;
-	}
-	map->map[i] = ft_strnew(1);
-	printf("i = %d, ret = %d et map[i] = %s\n", i, ret, map->map[i]);
-	close(fd);
-	return (1);
+	all->apoint = (t_point *)ft_memalloc(sizeof(t_point));
+	all->awin = (t_win *)ft_memalloc(sizeof(t_win));
+	all->amap = (t_map *)ft_memalloc(sizeof(t_map));
 }
 
-
-int	map_line(t_map *map, char *av)
+void	init_size_point(t_all *all)
 {
-	int		fd;
-	int		ret;
-	char	*tmp;
-
-	fd = open(av, O_RDONLY);
-	ret = 1;
-	map->l = 0;
-	printf("\n\n----MAP_LINE-----\nfd = %d\n", fd);
-	tmp = ft_strnew(1);;
-	ft_putstr("1");
-	while (ret)
-	{
-		ret = read(fd, tmp, 1);
-		if (*tmp == '\n' && ret == 1)
-			map->l++;
-		printf("l = %d et ret = %d et tmp = %c\n", map->l, ret, *tmp);
-	}
-	close(fd);
-	return (1);
+	all->apoint->x1 = 250;
+	all->apoint->y1 = 50;
+	all->apoint->x2 = 10;
+	all->apoint->y2 = 10;
 }
 
-
-int	main(int ac, char **av)
+int		main(int argc, char **argv)
 {
-	t_map	map;
-	t_win	win;
-	t_shape	shape;
+	t_all	*all;
 
-	if (ac > 1)
+	all = (t_all*)ft_memalloc(sizeof(t_all));
+	printf("malloc all is ok\n");
+	init_struct(all);
+	printf("init_struct is ok\n");
+	if (argc == 2 && argv[1])
 	{
-		win.mlx = mlx_init();
-		win.h = 300;
-		win.w = 300;
-		win.win = mlx_new_window(win.mlx, win.h, win.w, "Test recup new_image");
-		init_shape(&win, &shape, &map);
-		map_line(&map, av[1]);
-		read_map(&map, av[1]);
-		draw_map(&map);
-		//mlx_key_hook(win.win, close_win, &shape);
-		mlx_loop(win.mlx);
+		if ((all->awin->mlx = mlx_init()) == NULL)
+			return (0);
+		init_size_win(all);
+	printf("init size win is ok\n");
+		if ((all->awin->win = mlx_new_window(all->awin->mlx, all->awin->width, all->awin->height, "Hello world")) == NULL)
+			return (0);
+		//mlx_loop_hook(win.mlx);
+		//mlx_clear_window(win.mlx, win.win);
+		mlx_pixel_put(all->awin->mlx, all->awin->win, all->awin->width / 2, all->awin->height / 2, PINK);
+		mlx_string_put(all->awin->mlx, all->awin->win, all->awin->width / 4, all->awin->height / 4, BLUE, "Hello world");
+		init_size_point(all);
+	printf("init size point is ok\n");
+		bres(all);
+		//win.image = mlx_new_image(win.mlx, win.width, win.height);
+		//mlx_get_data_addr(void *img_ptr, int *bits_per_pixel, int *size_line, int *endian)
+		all->amap->name = argv[1];
+		open_map(all);
+		mlx_key_hook(all->awin->win, key_press, all);
+		mlx_loop(all->awin->mlx);
 	}
 	return (0);
 }
