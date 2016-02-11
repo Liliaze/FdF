@@ -6,13 +6,13 @@
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/01 16:23:38 by dboudy            #+#    #+#             */
-/*   Updated: 2016/02/03 12:48:18 by dboudy           ###   ########.fr       */
+/*   Updated: 2016/02/11 14:07:59 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static	void	bres_dx_sup(t_all *all, int dx, int dy, int incx, int incy)
+static	void	bres_dx_sup(t_all *all)
 {
 	int	i;
 	int e;
@@ -20,28 +20,26 @@ static	void	bres_dx_sup(t_all *all, int dx, int dy, int incx, int incy)
 	int inc2;
 
 	i = 0;
-	mlx_pixel_put(all->awin->mlx, all->awin->win, all->apoint->x1,
-			all->apoint->y1, CYAN);
-	e = 2 * dy - dx;
-	inc1 = 2 * (dy - dx);
-	inc2 = 2 * dy;
-	while (i < dx)
+	mlx_pixel_put(MLX, WIN, all->apoint->x1, all->apoint->y1, COLOR);
+	e = 2 * all->abres->dy - all->abres->dx;
+	inc1 = 2 * (all->abres->dy - all->abres->dx);
+	inc2 = 2 * all->abres->dy;
+	while (i < all->abres->dx)
 	{
 		if (e >= 0)
 		{
-			all->apoint->y1 += incy;
+			all->apoint->y1 += all->abres->incy;
 			e += inc1;
 		}
 		else
 			e += inc2;
-		all->apoint->x1 += incx;
-		mlx_pixel_put(all->awin->mlx, all->awin->win, all->apoint->x1,
-				all->apoint->y1, CYAN);
+		all->apoint->x1 += all->abres->incx;
+		mlx_pixel_put(MLX, WIN, all->apoint->x1, all->apoint->y1, COLOR);
 		i++;
 	}
 }
 
-static void		bres_else(t_all *all, int dx, int dy, int incx, int incy)
+static void		bres_else(t_all *all)
 {
 	int	i;
 	int	e;
@@ -49,49 +47,42 @@ static void		bres_else(t_all *all, int dx, int dy, int incx, int incy)
 	int inc2;
 
 	i = 0;
-	mlx_pixel_put(all->awin->mlx, all->awin->win, all->apoint->x1,
-			all->apoint->y1, CYAN);
-	e = 2 * dx - dy;
-	inc1 = 2 * (dx - dy);
-	inc2 = 2 * dx;
-	while (i < dy)
+	mlx_pixel_put(MLX, WIN, all->apoint->x1, all->apoint->y1, COLOR);
+	e = 2 * all->abres->dx - all->abres->dy;
+	inc1 = 2 * (all->abres->dx - all->abres->dy);
+	inc2 = 2 * all->abres->dx;
+	while (i < all->abres->dy)
 	{
 		if (e >= 0)
 		{
-			all->apoint->x1 += incx;
+			all->apoint->x1 += all->abres->incx;
 			e += inc1;
 		}
 		else
 			e += inc2;
-		all->apoint->y1 += incy;
-		mlx_pixel_put(all->awin->mlx, all->awin->win, all->apoint->x1,
-				all->apoint->y1, CYAN);
+		all->apoint->y1 += all->abres->incy;
+		mlx_pixel_put(MLX, WIN, all->apoint->x1, all->apoint->y1, COLOR);
 		i++;
 	}
 }
 
 int				bres(t_all *all)
 {
-	int	dx;
-	int dy;
-	int incx;
-	int incy;
-
-	dx = all->apoint->x2 - all->apoint->x1;
-	dy = all->apoint->y2 - all->apoint->y1;
-	if (dx < 0)
-		dx = -dx;
-	if (dy < 0)
-		dy = -dy;
-	incx = 1;
+	all->abres->dx = all->apoint->x2 - all->apoint->x1;
+	all->abres->dy = all->apoint->y2 - all->apoint->y1;
+	if (all->abres->dx < 0)
+		all->abres->dx = -all->abres->dx;
+	if (all->abres->dy < 0)
+		all->abres->dy = -all->abres->dy;
+	all->abres->incx = 1;
 	if (all->apoint->x2 < all->apoint->x1)
-		incx = -1;
-	incy = 1;
+		all->abres->incx = -1;
+	all->abres->incy = 1;
 	if (all->apoint->y2 < all->apoint->y1)
-		incy = -1;
-	if (dx > dy)
-		bres_dx_sup(all, dx, dy, incx, incy);
+		all->abres->incy = -1;
+	if (all->abres->dx > all->abres->dy)
+		bres_dx_sup(all);
 	else
-		bres_else(all, dx, dy, incx, incy);
+		bres_else(all);
 	return (0);
 }

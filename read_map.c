@@ -6,77 +6,126 @@
 /*   By: dboudy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/02 15:35:50 by dboudy            #+#    #+#             */
-/*   Updated: 2016/02/03 16:38:57 by dboudy           ###   ########.fr       */
+/*   Updated: 2016/02/11 15:33:50 by dboudy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	print_values_of_map(t_all *all) //fonction support a enlever dans rendue final
+static void		free_my_map(t_all *all)
 {
 	int i;
 	int j;
 
 	i = 0;
-	while (all->amap->map[i])
+	while (MAP[i])
 	{
 		j = 0;
-		printf("map[%d][%d] cree = ", i, j);
-		while (all->amap->map[i][j])
+		while (MAP[i][j])
 		{
-			printf("%s", all->amap->map[i][j]);
+			ft_memdel((void **)&MAP[i][j]);
 			j++;
 		}
-		printf("\n");
+		ft_memdel((void **)&MAP[i]);
+		i++;
+	}
+	free(MAP);
+	MAP = NULL;
+}
+
+void			zmin_and_zmax(t_all *all)
+{
+	int i;
+	int j;
+
+	i = 0;
+	ZMAX = 0;
+	ZMIN = 0;
+	while (MAP[i])
+	{
+		j = 0;
+		while (MAP[i][j])
+		{
+			if (ft_atoi(MAP[i][j]) * COEFZ > ZMAX)
+				ZMAX = ft_atoi(MAP[i][j]) * COEFZ;
+			if (ft_atoi(MAP[i][j]) * COEFZ < ZMIN)
+				ZMIN = ft_atoi(MAP[i][j]) * COEFZ;
+			j++;
+		}
 		i++;
 	}
 }
 
-void	look_size_map(t_all *all)
+static int		look_size_map(t_all *all)
 {
 	char	tmp[2];
 	int		ret;
 	int		fd;
+	int		check_data;
 
 	ret = 1;
-	if ((fd = open(all->amap->name, O_RDONLY)) == -1)
-		display_error("Please join a correct map\n");
+	check_data = 0;
+	all->amap->nb_y = 0;
+	fd = open(TNAME, O_RDONLY);
 	while (ret > 0)
 	{
-		if ((ret = read(fd, tmp, 1)) == -1)
-			display_error("An error in reading the map occurred\n");
+		if ((ret = read(fd, tmp, 1)) > 0)
+			check_data = 1;
 		if (*tmp == '\n' && ret != 0)
-			all->amap->size++;
+			all->amap->nb_y++;
 	}
 	close(fd);
+	if (check_data == 1 && fd >= 0)
+		return (1);
+	all->in_menu = -1;
+	mlx_clear_window(MLX, WIN);
+	mlx_string_put(MLX, WIN, (MAPW - 61 * 11) / 2, MAPH / 2, RED,
+			"This map is empty or invalid. Press ENTER to return in Menu.");
+	return (0);
 }
 
-int		open_map(t_all *all)
+static void		nb_x(t_all *all, char *line)
 {
 	int	i;
-	int j;
-	int fd;
-	int ret;
-	char *line;
-	char **values;
 
 	i = 0;
-	j = 0;
-	printf("enter in open_map\n");
-	look_size_map(all);
-	printf("nb of line in map = %d", all->amap->size);
-	all->amap->map = (char***)malloc(sizeof(all->amap->map) * all->amap->size + 1);
-	if ((fd = open(all->amap->name, O_RDONLY)) == -1)
-		display_error("Please join a correct map\n");
-	printf("open is okay\n");
-	while (i < all->amap->size)
+	all->amap->nb_x = 0;
+	while (line[i])
 	{
-		ret = get_next_line(fd, &line);
-		values = ft_strsplit(line, ' ');
-		all->amap->map[i] = values;
-		i++;
+		while (line[i] == ' ' && line[i])
+			i++;
+		if (line[i] != ' ' && line[i])
+			all->amap->nb_x++;
+		while (line[i] != ' ' && line[i])
+			i++;
 	}
-	all->amap->map[i] = NULL;
-	print_values_of_map(all);
+}
+
+int				open_map(t_all *all)
+{
+	int		i;
+	int		fd;
+	char	*line;
+	char	**values;
+
+	i = -1;
+	if (MAP)
+		free_my_map(all);
+	if (!look_size_map(all))
+		return (0);
+	MAP = (char***)malloc(sizeof(MAP) * all->amap->nb_y + 1);
+	if ((fd = open(TNAME, O_RDONLY)) == -1)
+		display_error("Please join a correct map\n");
+	while (++i < all->amap->nb_y)
+	{
+		if ((get_next_line(fd, &line)) == -1)
+			display_error("Problem during the reading of the card\n");
+		if (i == 0)
+			nb_x(all, line);
+		values = ft_strsplit(line, ' ');
+		MAP[i] = values;
+		free(line);
+	}
+	MAP[i] = NULL;
 	return (1);
 }
